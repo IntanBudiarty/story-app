@@ -1,0 +1,11 @@
+API Keys and Credentials:
+
+Map Service: OpenStreetMap (No API key required)
+Story API: https://story-api.dicoding.dev/v1
+- Authentication token should be obtained from the API and stored in localStorage
+
+Application Information:
+- Name: StoryVerse
+- Description: A platform for sharing stories with location context
+- Author: [Intan Budiarty]
+- Dicoding Submission Project
