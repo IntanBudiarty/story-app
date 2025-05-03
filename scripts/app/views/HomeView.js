@@ -19,16 +19,16 @@ class HomeView {
 
   showStories(stories) {
     const mainContent = this._getMainContent();
-    
+  
     if (!stories || stories.length === 0) {
       mainContent.innerHTML = `
-        <h2>Recent Stories</h2>
+        <h2><i class="fas fa-book-open"></i> Recent Stories</h2>
         <p>No stories found. Be the first to share your story!</p>
         <div id="map"></div>
       `;
       return;
     }
-    
+  
     const storiesHTML = stories.map(story => `
       <article class="story-card" data-id="${story.id}">
         ${story.photoUrl ? `
@@ -37,30 +37,37 @@ class HomeView {
                class="story-image"
                onerror="this.remove()"> 
         ` : ''}
+  
         <div class="story-content">
-          <h3 class="story-title">${story.name || 'Untitled Story'}</h3>
+          <h3 class="story-title">
+            <i class="fas fa-pen-nib"></i> ${story.name || 'Untitled Story'}
+          </h3>
+  
           <p class="story-description">${story.description || 'No description available'}</p>
+  
           <div class="story-meta">
-            <span>${story.createdAt ? new Date(story.createdAt).toLocaleDateString() : 'Unknown date'}</span>
-            <span>${story.name || 'Unknown author'}</span>
+            <span><i class="fas fa-calendar-alt"></i> ${story.createdAt ? new Date(story.createdAt).toLocaleDateString() : 'Unknown date'}</span>
+            <span><i class="fas fa-user"></i> ${story.name || 'Unknown author'}</span>
           </div>
+  
           <button class="view-detail-btn" data-id="${story.id}">
-            View Detail
+            <i class="fas fa-eye"></i> View Detail
           </button>
         </div>
       </article>
     `).join('');
-    
+  
     mainContent.innerHTML = `
-      <h2>Recent Stories</h2>
+      <h2><i class="fas fa-book-open"></i> Recent Stories</h2>
       <div class="stories-container">
         ${storiesHTML}
       </div>
       <div id="map"></div>
     `;
-
+  
     this._initViewDetailButtons();
   }
+  
 
   showError(message) {
     const mainContent = this._getMainContent();
