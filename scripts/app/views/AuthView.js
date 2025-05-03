@@ -9,41 +9,48 @@ class AuthView {
   _render() {
     const container = document.getElementById('auth-view');
     if (!container) return;
-    
+
     container.innerHTML = `
-      <div class="auth-container">
-        <h2>${this.mode === 'login' ? 'Login' : 'Register'}</h2>
-        <form id="auth-form">
-          ${this.mode === 'register' ? `
+      <div class="auth-wrapper">
+        <div class="auth-image">
+          <img src="assets/images/bg-login.gif" alt="Auth Image">
+        </div>
+        <div class="auth-content">
+          <h2>${this.mode === 'login' ? 'Welcome Back!' : 'Create an Account'}</h2>
+          <form id="auth-form">
+            ${this.mode === 'register' ? `
+              <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Your name" required>
+              </div>
+            ` : ''}
             <div class="form-group">
-              <label for="name">Name</label>
-              <input type="text" id="name" required>
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="you@example.com" required>
             </div>
             <div class="form-group">
-              <label for="confirm-password">Confirm Password</label>
-              <input type="password" id="confirm-password" required minlength="8">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="Minimum 8 characters" required minlength="8">
             </div>
-          ` : ''}
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" required>
+            ${this.mode === 'register' ? `
+              <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" placeholder="Retype your password" required minlength="8">
+              </div>
+            ` : ''}
+            <button type="submit" class="btn-primary">
+              ${this.mode === 'login' ? 'Login' : 'Register'}
+            </button>
+          </form>
+          <div class="auth-footer">
+            ${this.mode === 'login' 
+              ? `Belum punya akun? <a href="#/register">Daftar disini</a>`
+              : `Sudah punya akun? <a href="#/login">Login disini</a>`}
           </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" required minlength="8">
-          </div>
-          <button type="submit" class="btn btn-primary">
-            ${this.mode === 'login' ? 'Login' : 'Register'}
-          </button>
-        </form>
-        <div class="auth-footer">
-          ${this.mode === 'login' 
-            ? 'Belum punya akun? <a href="#/register">Daftar disini</a>'
-            : 'Sudah punya akun? <a href="#/login">Login disini</a>'}
         </div>
       </div>
     `;
-    
+
     this._initForm();
   }
 
@@ -53,7 +60,7 @@ class AuthView {
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const submitBtn = form.querySelector('button[type="submit"]');
       try {
         submitBtn.disabled = true;
@@ -68,11 +75,11 @@ class AuthView {
         } else {
           const name = document.getElementById('name').value;
           const confirmPassword = document.getElementById('confirm-password').value;
-          
+
           if (password !== confirmPassword) {
             throw new Error('Passwords do not match');
           }
-          
+
           await AuthService.register({ name, email, password });
           alert('Registration successful! Please login.');
           window.location.hash = '#/login';
@@ -86,4 +93,5 @@ class AuthView {
     });
   }
 }
+
 export default AuthView;

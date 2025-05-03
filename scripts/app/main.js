@@ -1,5 +1,6 @@
 import Router from '../router.js';
 import '../../styles/main.css';
+import AuthService from '../services/AuthService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('main')) {
@@ -10,7 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 darkModeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 });
-
-  
+const logoutBtn = document.getElementById('logoutButton');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      AuthService.logout();
+      window.location.hash = '#/login';
+    });
+  }
   new Router();
 });

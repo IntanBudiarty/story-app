@@ -1,3 +1,4 @@
+
 class AddStoryView {
     constructor() {
         this._renderForm();
@@ -45,6 +46,7 @@ class AddStoryView {
             </form>
         `;
 
+        // Camera button events
         document.getElementById('openCameraBtn').addEventListener('click', () => {
             document.getElementById('cameraPreview').style.display = 'block';
             document.getElementById('captureButton').style.display = 'inline-block';
@@ -103,4 +105,6 @@ class AddStoryView {
         alert(`Error: ${message}`);
     }
 }
+
 export default AddStoryView;
+
