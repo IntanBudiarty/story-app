@@ -6,14 +6,13 @@ import { initCamera, stopCamera ,photoPreview} from '../utils/camera.js';
 class AddStoryPresenter {
   constructor() {
     this._addStoryView = new AddStoryView();
-    this._marker = null; 
     this._initForm().catch(error => {
       console.error('Initialization error:', error);
       this._addStoryView.showError('Failed to initialize form');
     });
   }
 
-  async _initForm() {
+  async init() {
     try {
       const map = initMap('add-story-map');
       if (!map) {
@@ -27,7 +26,7 @@ class AddStoryPresenter {
         console.warn('Location error:', error.message);
         map.setView([0, 0], 2);
       }
-      
+
       map.on('click', (e) => {
         this._addStoryView.setCoordinates(e.latlng.lat, e.latlng.lng);
         if (this._marker) {
@@ -52,7 +51,7 @@ class AddStoryPresenter {
 
     } catch (error) {
       console.error('Form initialization failed:', error);
-      throw error;
+      this._addStoryView.showError('Failed to initialize form');
     }
   }
 
@@ -62,7 +61,7 @@ class AddStoryPresenter {
       const photo = document.getElementById('photoInput').files[0];
       const lat = document.getElementById('latitude').value;
       const lon = document.getElementById('longitude').value;
-      
+
       if (!photo || !description) {
         throw new Error('Please fill all required fields');
       }
@@ -79,4 +78,5 @@ class AddStoryPresenter {
     }
   }
 }
+
 export default AddStoryPresenter;
