@@ -6,6 +6,7 @@ import { initCamera, stopCamera ,photoPreview} from '../utils/camera.js';
 class AddStoryPresenter {
   constructor() {
     this._addStoryView = new AddStoryView();
+    this._marker = null; 
     this._initForm().catch(error => {
       console.error('Initialization error:', error);
       this._addStoryView.showError('Failed to initialize form');
@@ -29,6 +30,11 @@ class AddStoryPresenter {
       
       map.on('click', (e) => {
         this._addStoryView.setCoordinates(e.latlng.lat, e.latlng.lng);
+        if (this._marker) {
+          this._marker.setLatLng(e.latlng);
+        } else {
+          this._marker = L.marker(e.latlng).addTo(map);
+        }
       });
 
       try {
@@ -38,7 +44,6 @@ class AddStoryPresenter {
         this._addStoryView.showCameraError();
       }
 
-      // Form submission
       const form = document.getElementById('addStoryForm');
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
