@@ -3,12 +3,13 @@ import AddStoryPresenter from '../scripts/app/presenter/AddStoryPresenter.js';
 import DetailPresenter from '../scripts/app/presenter/DetailPresenter.js';
 import AuthView from '../scripts/app/views/AuthView.js';
 import AuthService from '../scripts/services/AuthService.js';
+import { stopCamera } from '../scripts/app/utils/camera.js';
 
 const routes = {
   '/home': {
-    template: '<div id="home-view"></div>',
-    presenter: HomePresenter,
-    auth: true 
+  template: '<div id="home-view"></div>',
+  presenter: HomePresenter,
+  auth: true 
   },
   '/login': {
     template: '<div id="auth-view"></div>',
@@ -61,34 +62,41 @@ class Router {
   }
 
   loadRoute() {
-    try {
-      const hash = window.location.hash.substring(1) || '/login';
-      const route = this.getRoute(hash);
-      
-      // Redirect jika perlu autentikasi
-      if (route.auth && !AuthService.isAuthenticated()) {
-        window.location.hash = '#/login';
-        return;
-      }
+  try {
+    stopCamera();
+    const hash = window.location.hash.substring(1) || '/login';
+    const route = this.getRoute(hash);
 
-      const mainContent = document.querySelector('main');
-      if (!mainContent) {
-        throw new Error('Main content element not found');
-      }
-
-      mainContent.innerHTML = route.template;
-      
-      if (route.init) {
-        route.init();
-      } else if (route.presenter) {
-        const params = this.extractParams(hash);
-        new route.presenter(params);
-      }
-    } catch (error) {
-      console.error('Routing error:', error);
-      this.showErrorPage(error);
+    if (route.auth && !AuthService.isAuthenticated()) {
+      window.location.hash = '#/login';
+      return;
     }
+
+    const mainContent = document.querySelector('main');
+    if (!mainContent) {
+      throw new Error('Main content element not found');
+    }
+
+    mainContent.innerHTML = `
+      <div id="main-content" tabindex="-1">
+        ${route.template}
+      </div>
+    `;
+
+    const mainContentArea = document.getElementById('main-content');
+    mainContentArea.focus();
+
+    if (route.init) {
+      route.init();
+    } else if (route.presenter) {
+      const params = this.extractParams(hash);
+      new route.presenter(params);
+    }
+  } catch (error) {
+    console.error('Routing error:', error);
+    this.showErrorPage(error);
   }
+}
 
   getRoute(hash) {
     if (hash.startsWith('/detail/')) {

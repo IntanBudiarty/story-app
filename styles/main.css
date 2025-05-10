@@ -28,7 +28,7 @@ body {
     background-color: var(--primary-color);
     color: white;
     padding: 8px;
-    z-index: 100;
+    z-index: 1000;
     text-decoration: none;
 }
 
@@ -391,7 +391,6 @@ footer {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-/* styles/main.css */
 .auth-container {
     max-width: 400px;
     margin: 2rem auto;

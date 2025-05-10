@@ -4,7 +4,7 @@ import AuthService from '../services/AuthService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('main')) {
-    document.body.innerHTML = '<main id="main-content"></main>';
+    document.body.innerHTML = '<main id="main-content" tabindex="-1"></main>';
   }
   const darkModeToggle = document.getElementById('darkModeToggle');
 
