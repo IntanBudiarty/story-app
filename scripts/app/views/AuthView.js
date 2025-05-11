@@ -1,9 +1,18 @@
 import AuthService from '../../services/AuthService.js';
 
 class AuthView {
-  constructor(mode = 'login') {
+   constructor(mode = 'login') {
     this.mode = mode;
+    this._presenter = null;
     this._render();
+  }
+  init() {
+  this._render();
+}
+
+
+  bindPresenter(presenter) {
+    this._presenter = presenter;
   }
 
   _render() {
@@ -42,6 +51,8 @@ class AuthView {
               ${this.mode === 'login' ? 'Login' : 'Register'}
             </button>
           </form>
+          <div id="error-container" style="display:none; color:red; margin-top: 10px;"></div>
+
           <div class="auth-footer">
             ${this.mode === 'login' 
               ? `Belum punya akun? <a href="#/register">Daftar disini</a>`
@@ -53,44 +64,55 @@ class AuthView {
 
     this._initForm();
   }
-
   _initForm() {
     const form = document.getElementById('auth-form');
     if (!form) return;
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        if (this.mode === 'login') {
-          await AuthService.login({ email, password });
-          window.location.hash = '#/home';
-        } else {
-          const name = document.getElementById('name').value;
-          const confirmPassword = document.getElementById('confirm-password').value;
-
-          if (password !== confirmPassword) {
-            throw new Error('Passwords do not match');
-          }
-
-          await AuthService.register({ name, email, password });
-          alert('Registration successful! Please login.');
-          window.location.hash = '#/login';
-        }
-      } catch (error) {
-        alert(`Error: ${error.message}`);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = this.mode === 'login' ? 'Login' : 'Register';
+      console.log('Form submitted');
+      if (this._presenter && this._presenter.handleAuthSubmit) {
+        const formData = this.getFormData();
+        console.log('Form data:', formData);
+        this._presenter.handleAuthSubmit(formData);
       }
     });
+
+
+  }
+  
+  getFormData() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const data = { email, password };
+
+    if (this.mode === 'register') {
+      data.name = document.getElementById('name').value;
+      data.confirmPassword = document.getElementById('confirm-password').value;
+    }
+
+    return data;
+  }
+
+  showLoading() {
+    const submitBtn = document.querySelector('#auth-form button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+  }
+  resetButton() {
+  const submitBtn = document.querySelector('#auth-form button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = this.mode === 'login' ? 'Login' : 'Register';
+  }
+}
+  showError(message) {
+    const errorContainer = document.getElementById('error-container');
+    if (errorContainer) {
+      errorContainer.textContent = message;
+      errorContainer.style.display = 'block';  
+    }
   }
 }
 

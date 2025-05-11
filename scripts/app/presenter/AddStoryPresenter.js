@@ -1,83 +1,66 @@
 import AddStoryView from '../views/AddStoryView.js';
 import StoryData from '../../data/StoryData.js';
 import { initMap, getCurrentLocation } from '../utils/map.js';
-import { initCamera, stopCamera ,photoPreview} from '../utils/camera.js';
+import { initCamera, stopCamera } from '../utils/camera.js';
 
 class AddStoryPresenter {
   constructor() {
-    this._addStoryView = new AddStoryView();
-    this._marker = null; 
-    this._initForm().catch(error => {
-      console.error('Initialization error:', error);
-      this._addStoryView.showError('Failed to initialize form');
-    });
+    this._view = new AddStoryView();
+    this._view.bindPresenter(this); // Now this will work
+    this._initMap();
+    this._initCamera();
   }
 
-  async init() {
+  async _initMap() {
     try {
       const map = initMap('add-story-map');
-      if (!map) {
-        throw new Error('Failed to initialize map');
-      }
+      if (!map) throw new Error('Failed to initialize map');
 
       try {
         const position = await getCurrentLocation();
-        map.setView([position.coords.latitude, position.coords.longitude], 13);
+        this._view.setMapView(map, position);
       } catch (error) {
         console.warn('Location error:', error.message);
-        map.setView([0, 0], 2);
+        this._view.setMapView(map, { lat: 0, lng: 0 });
       }
 
       map.on('click', (e) => {
-        this._addStoryView.setCoordinates(e.latlng.lat, e.latlng.lng);
-        if (this._marker) {
-          this._marker.setLatLng(e.latlng);
-        } else {
-          this._marker = L.marker(e.latlng).addTo(map);
-        }
-      });
-
-      try {
-        await initCamera('cameraPreview', 'captureButton', 'photoPreview');
-      } catch (error) {
-        console.warn('Camera error:', error.message);
-        this._addStoryView.showCameraError();
-      }
-
-      const form = document.getElementById('addStoryForm');
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        await this._handleFormSubmit();
+        this._view.updateMarkerPosition(e.latlng);
       });
 
     } catch (error) {
-      console.error('Form initialization failed:', error);
-      this._addStoryView.showError('Failed to initialize form');
+      this._view.showError('Failed to initialize map: ' + error.message);
     }
   }
 
-  async _handleFormSubmit() {
+  async _initCamera() {
     try {
-      const description = document.getElementById('description').value;
-      const photo = document.getElementById('photoInput').files[0];
-      const lat = document.getElementById('latitude').value;
-      const lon = document.getElementById('longitude').value;
-
-      if (!photo || !description) {
-        throw new Error('Please fill all required fields');
-      }
-
-      this._addStoryView.showLoading();
-      await StoryData.addStory({ photo, description, lat, lon });
-      this._addStoryView.showSuccess();
-      window.location.hash = '#/home';
-
+      await initCamera('cameraPreview', 'captureButton', 'photoPreview');
     } catch (error) {
-      this._addStoryView.showError(error.message);
-    } finally {
-      stopCamera();
+      this._view.showError('Camera initialization failed: ' + error.message);
     }
   }
+
+ async handleFormSubmit() {
+  try {
+    this._view.showLoading();
+
+    const { photo, description, lat, lng } = this._view.getFormData();
+
+    if (!photo || !description) {
+      throw new Error('Please fill all required fields');
+    }
+
+    await StoryData.addStory({ photo, description, lat, lng });
+    this._view.showSuccess();
+    window.location.hash = '#/home';
+  } catch (error) {
+    this._view.showError(error.message);
+  } finally {
+    stopCamera();
+  }
+}
+
 }
 
 export default AddStoryPresenter;

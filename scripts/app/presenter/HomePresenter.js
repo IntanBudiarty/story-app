@@ -10,22 +10,13 @@ class HomePresenter {
     this._showStories();
     this._initLogoutButton();
   }
-    async getStories() {
-      try {
-        const response = await StoryData.getStories();
-        return response;
-      } catch (error) {
-        throw new Error('Gagal memuat cerita!');
-      }
-    }
-
 
   async _showStories() {
     try {
       this._homeView.showLoading();
       const response = await StoryData.getAllStories();
       this._homeView.showStories(response.listStory);
-      
+
       const map = initMap('map');
       showStoriesOnMap(map, response.listStory);
     } catch (error) {
@@ -49,35 +40,5 @@ class HomePresenter {
       });
     }
   }
-renderStoryList(stories) {
-  return `
-    <div class="story-list">
-      ${stories.map(story => `
-        <article class="story-card" data-id="${story.id}">
-          <img src="${story.photoUrl || 'assets/images/default-thumbnail.jpg'}" 
-               alt="${story.name}" 
-               class="story-image"
-               onerror="this.onerror=null;this.src='assets/images/default-thumbnail.jpg'">
-          
-          <div class="story-content">
-            <h3>${story.name}</h3>
-            <p>${story.description.substring(0, 100)}...</p>
-            <a href="#/detail/${story.id}" class="btn btn-detail">View Detail</a>
-            </button>
-          </div>
-        </article>
-      `).join('')}
-    </div>
-  `;
-}
-
-initViewDetailButtons() {
-  document.querySelectorAll('.btn-view-detail').forEach(button => {
-    button.addEventListener('click', (e) => {
-      const storyId = e.target.getAttribute('data-id');
-      window.location.hash = `#/detail/${storyId}`;
-    });
-  });
-}
 }
 export default HomePresenter;

@@ -1,6 +1,7 @@
 import Router from '../router.js';
 import '../../styles/main.css';
 import AuthService from '../services/AuthService.js';
+import AuthPresenter from './presenter/AuthPresenter.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.querySelector('main')) {
